@@ -87,6 +87,7 @@ impl<G: Group, S: RelaxedR1CSSNARKTrait<G>, C: Circuit<G::Scalar>> SNARK<G, S, C
     let mut cs: ShapeCS<G> = ShapeCS::new();
     let _ = circuit.synthesize(&mut cs);
     let (shape, ck) = cs.r1cs_shape();
+    let shape = shape.pad();
 
     let (pk, vk) = S::setup(&ck, &shape)?;
     let pk = ProverKey { S: shape, ck, pk };
@@ -163,6 +164,7 @@ mod tests {
       let y = AllocatedNum::alloc(cs.namespace(|| "y"), || {
         Ok(x_cu.get_value().unwrap() + x.get_value().unwrap() + F::from(5u64))
       })?;
+      let z = AllocatedNum::alloc(cs.namespace(|| "z"), || Ok(F::from(1u64)))?;
 
       cs.enforce(
         || "y = x^3 + x + 5",
@@ -177,6 +179,13 @@ mod tests {
         },
         |lc| lc + CS::one(),
         |lc| lc + y.get_variable(),
+      );
+
+      cs.enforce(
+        || "z = 1",
+        |lc| lc + z.get_variable(),
+        |lc| lc + CS::one() - z.get_variable(),
+        |lc| lc,
       );
 
       let _ = y.inputize(cs.namespace(|| "output"));
@@ -222,6 +231,7 @@ mod tests {
 
     // verify the SNARK
     let res = snark.verify(&vk);
+    println!("res: {:?}", res);
     assert!(res.is_ok());
 
     let io = res.unwrap();
