@@ -231,7 +231,6 @@ mod tests {
 
     // verify the SNARK
     let res = snark.verify(&vk);
-    println!("res: {:?}", res);
     assert!(res.is_ok());
 
     let io = res.unwrap();
