@@ -7,13 +7,13 @@
 //! In polynomial.rs we also provide foundational types and functions for manipulating multilinear polynomials.
 pub(crate) mod math;
 pub mod polys;
-pub mod ppsnark;
+// pub mod ppsnark;
 pub mod snark;
 mod sumcheck;
 
 use crate::{traits::Group, Commitment};
 use ff::Field;
-use polys::multilinear::SparsePolynomial;
+//use polys::multilinear::SparsePolynomial;
 
 fn powers<G: Group>(s: &G::Scalar, n: usize) -> Vec<G::Scalar> {
   assert!(n >= 1);
@@ -57,6 +57,7 @@ impl<G: Group> PolyEvalWitness<G> {
     PolyEvalWitness { p }
   }
 
+  #[allow(dead_code)]
   fn batch(p_vec: &[&Vec<G::Scalar>], s: &G::Scalar) -> PolyEvalWitness<G> {
     let powers_of_s = powers::<G>(s, p_vec.len());
     let mut p = vec![G::Scalar::ZERO; p_vec[0].len()];
@@ -96,6 +97,7 @@ impl<G: Group> PolyEvalInstance<G> {
     }
   }
 
+  #[allow(dead_code)]
   fn batch(
     c_vec: &[Commitment<G>],
     x: &[G::Scalar],

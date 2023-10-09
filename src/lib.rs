@@ -33,11 +33,7 @@ use core::marker::PhantomData;
 use errors::SpartanError;
 use r1cs::{R1CSShape, RelaxedR1CSInstance, RelaxedR1CSWitness};
 use serde::{Deserialize, Serialize};
-use traits::{
-  commitment::{CommitmentEngineTrait, CommitmentTrait},
-  snark::RelaxedR1CSSNARKTrait,
-  Group,
-};
+use traits::{commitment::CommitmentEngineTrait, snark::RelaxedR1CSSNARKTrait, Group};
 
 /// A type that holds the prover key
 #[derive(Clone, Serialize, Deserialize)]
@@ -112,7 +108,7 @@ impl<G: Group, S: RelaxedR1CSSNARKTrait<G>, C: Circuit<G::Scalar>> SNARK<G, S, C
     );
 
     // prove the instance using Spartan
-    let snark = S::prove(&pk.ck, &pk.pk, &u_relaxed, &w_relaxed)?;
+    let snark = S::prove(&pk.ck, &pk.pk, &pk.S, &u_relaxed, &w_relaxed)?;
 
     Ok(SNARK {
       comm_W: u.comm_W,
@@ -136,7 +132,7 @@ impl<G: Group, S: RelaxedR1CSSNARKTrait<G>, C: Circuit<G::Scalar>> SNARK<G, S, C
 
 type CommitmentKey<G> = <<G as traits::Group>::CE as CommitmentEngineTrait<G>>::CommitmentKey;
 type Commitment<G> = <<G as Group>::CE as CommitmentEngineTrait<G>>::Commitment;
-type CompressedCommitment<G> = <<<G as Group>::CE as CommitmentEngineTrait<G>>::Commitment as CommitmentTrait<G>>::CompressedCommitment;
+//type CompressedCommitment<G> = <<<G as Group>::CE as CommitmentEngineTrait<G>>::Commitment as CommitmentTrait<G>>::CompressedCommitment;
 type CE<G> = <G as Group>::CE;
 
 #[cfg(test)]
